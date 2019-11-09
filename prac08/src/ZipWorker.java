@@ -1,89 +1,91 @@
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 class ZipWorker extends SwingWorker<Double, Integer> {
-    // Esta etiqueta se recibe en el constructor o a través de un
-    // metodo setEtiqueta().
-    private List<Observer> observers = new ArrayList<>();
-    private File folder =new File("C:\\Users\\Entrar\\Desktop\\practica7\\prueba");
+    
+    private List<String> files;
+    private File folder;
+    private MainFrame mainFrame;
     private final static int BUFFER_SIZE = 1024;
+    private final static int PERCENTAGE = 100;  
     
-    
-    
-    
-    public void addObserver(Observer observer){
-        observers.add(observer);
+    public ZipWorker(MainFrame mainFrame, File file) {
+        folder = file;
+        files = new ArrayList<String>();
+        this.mainFrame = mainFrame;
     }
-    
-    /*public void setFile(File folder){
-        this.folder = 
-    }*/
-   
     
     @Override
     protected Double doInBackground() throws Exception {
-   // Mostramos el nombre del hilo, para ver que efectivamente
-   // esto NO se ejecuta en el hilo de eventos.
+ 
         System.out.println("doInBackground() esta en el hilo "
-        + Thread.currentThread().getName()); 
+                + Thread.currentThread().getName());
         
-        /********** Algo de procesamiento costoso ***********/
+        comprimeFichero();
         
-        String[] files = folder.list();
-        comprimeFichero(files);
+        //publish(i);
         
-        
-        for (int i = 0; i < 10; i++) {
-            try {
-                Thread.sleep(1000);
-                // System.out.print(i);
-                
-            } catch (InterruptedException e) {
-                System.out.println("interrumpido");
-            }
-            publish(i);
-        }      
         return 100.0;
     }
-    
-   @Override
+
+    @Override
     protected void done() {
-       // Mostramos el nombre del hilo para ver que efectivamente esto
-       // se ejecuta en el hilo de eventos.
-       System.out.println("done() esta en el hilo " + Thread.currentThread().getName());     
+        mainFrame.finish();
     }
 
-    
     @Override
     protected void process(List<Integer> chunks) {
-        chunks.forEach((chunk) -> observers.forEach( (observer) -> observer.notifyProgess(chunk)));
+        chunks.forEach((chunk) -> mainFrame.notifyProgess(chunk));
     }
 
-    private void comprimeFichero(String[] files) {
+    private void comprimeFichero() {
+        int size = folder.list().length;
+        int cont = 0;
         try{
+        
+            BufferedInputStream origin = null;
+               
+            FileOutputStream dest = new FileOutputStream(folder.getAbsolutePath()+".zip");
+            ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
+
+            byte[] data = new byte[BUFFER_SIZE];
             
-            FileOutputStream fos = new FileOutputStream(folder.getPath() + ".zip");
-            ZipOutputStream zos = new ZipOutputStream(fos);
-            zos.putNextEntry(new ZipEntry(folder.getName()));
-            
-            byte[] data = new byte[BUFFER_SIZE]; 
-             
-            byte[] bytes = Files.readAllBytes(Paths.get(folder.getPath()));
-            zos.write(bytes,0,bytes.length);
-            zos.closeEntry();
-            zos.close();
-            
-        }catch(Exception e){
-            JOptionPane.showMessageDialog(null, e);
+            for(File i : folder.listFiles()){
+                Thread.sleep(1000);
+                cont++;
+                FileInputStream fi = new FileInputStream(i.getAbsolutePath());
+                origin = new BufferedInputStream(fi, BUFFER_SIZE);
+
+                ZipEntry entry = new ZipEntry(folder.getName()+File.separator+i.getName());
+                out.putNextEntry(entry);
+
+                int count;
+                while ((count = origin.read(data, 0, BUFFER_SIZE)) != -1) {
+                    out.write(data, 0, count);
+                }
+
+                origin.close();
+                publish((cont*PERCENTAGE/size));
+            }
+
+            out.close();
+        }
+        catch( Exception e){
+            e.printStackTrace();
         }
     }
 }

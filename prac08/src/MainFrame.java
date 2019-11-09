@@ -1,13 +1,26 @@
 
+import java.awt.Color;
+import java.io.File;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+
 public class MainFrame  extends javax.swing.JFrame implements Observer{
 
     /**
      * Creates new form NewJFrame
      */
+    File abre;
     public MainFrame() {
         initComponents();
-        progressBar.setMaximum(9);
+        UIManager.put( "nimbusOrange", Color.red );
+        progressBar.setMaximum(100);
         progressBar.setMinimum(0);
+        progressBar.setStringPainted(true);
+        progressBar.setForeground(Color.blue);
     }
     
     
@@ -20,26 +33,31 @@ public class MainFrame  extends javax.swing.JFrame implements Observer{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
-        AbrirCarpeta = new javax.swing.JButton();
+        comprimirButton = new javax.swing.JButton();
+        abrirCarpetaButton = new javax.swing.JButton();
         progressBar = new javax.swing.JProgressBar();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jButton1.setText("Comprimir carpeta");
-        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+        comprimirButton.setText("Comprimir carpeta");
+        comprimirButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jButton1MouseClicked(evt);
+                comprimirButtonMouseClicked(evt);
             }
         });
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        comprimirButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                comprimirButtonActionPerformed(evt);
             }
         });
 
-        AbrirCarpeta.setText("Abrir Nueva Carpeta");
+        abrirCarpetaButton.setText("Abrir Nueva Carpeta");
+        abrirCarpetaButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                abrirCarpetaButtonActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Estado de la compresion : ");
 
@@ -48,44 +66,79 @@ public class MainFrame  extends javax.swing.JFrame implements Observer{
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(39, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton1)
-                    .addComponent(AbrirCarpeta)
-                    .addComponent(jLabel1)
-                    .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 282, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(40, Short.MAX_VALUE))
+                .addGap(36, 36, 36)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel1)
+                        .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 282, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(abrirCarpetaButton)
+                        .addGap(18, 18, 18)
+                        .addComponent(comprimirButton, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(43, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(58, 58, 58)
-                .addComponent(AbrirCarpeta)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 69, Short.MAX_VALUE)
+                .addGap(54, 54, 54)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(abrirCarpetaButton)
+                    .addComponent(comprimirButton))
+                .addGap(26, 26, 26)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(74, 74, 74))
+                .addContainerGap(32, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
+    private void comprimirButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_comprimirButtonMouseClicked
+        // TODO add your handling code here:
+        
+
+    }//GEN-LAST:event_comprimirButtonMouseClicked
+
+    private void comprimirButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comprimirButtonActionPerformed
         // TODO add your handling code here:
         System.out.print("Pulsado!!");
         
-        ZipWorker worker = new ZipWorker();
-        worker.addObserver(this);
+        ZipWorker worker = new ZipWorker(this,abre);
         worker.execute();
-
-    }//GEN-LAST:event_jButton1MouseClicked
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_comprimirButtonActionPerformed
+    
+    
+    
+    private void abrirCarpetaButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abrirCarpetaButtonActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+        JFileChooser fileChoser = new JFileChooser();
+        fileChoser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        
+        FileFilter directoryFilter = new FileFilter() {
+			public boolean accept(File file) {
+				return file.isDirectory();
+			}
+
+            @Override
+            public String getDescription() {
+                return "Carpetas";
+            }
+		};
+        fileChoser.setFileFilter(directoryFilter);
+        fileChoser.setAcceptAllFileFilterUsed(false);
+        int resultado = fileChoser.showOpenDialog(this);
+        abre = fileChoser.getSelectedFile();
+        if (abre!= null && !abre.exists()){
+            JOptionPane.showMessageDialog(this, "El fichero " + abre.getAbsolutePath() + " no existe." );
+        }else if(resultado == JFileChooser.APPROVE_OPTION){
+            try {
+            
+            }catch(Exception e){System.out.println(e);}
+                
+        }
+        
+    }//GEN-LAST:event_abrirCarpetaButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -124,8 +177,8 @@ public class MainFrame  extends javax.swing.JFrame implements Observer{
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton AbrirCarpeta;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton abrirCarpetaButton;
+    private javax.swing.JButton comprimirButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JProgressBar progressBar;
     // End of variables declaration//GEN-END:variables
@@ -133,6 +186,10 @@ public class MainFrame  extends javax.swing.JFrame implements Observer{
     @Override
     public void notifyProgess(int porcentage) {
         progressBar.setValue(porcentage);
+    }
+
+    void finish() {
+        UIManager.put( "nimbusOrange", Color.GREEN );
     }
 }
 
