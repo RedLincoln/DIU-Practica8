@@ -22,11 +22,13 @@ class ZipWorker extends SwingWorker<Double, Integer> {
     private MainFrame mainFrame;
     private final static int BUFFER_SIZE = 1024;
     private final static int PERCENTAGE = 100;  
+    private String destPath;
     
-    public ZipWorker(MainFrame mainFrame, File file) {
+    public ZipWorker(MainFrame mainFrame, File file,String destPath) {
         folder = file;
         files = new ArrayList<String>();
         this.mainFrame = mainFrame;
+        this.destPath=destPath;
     }
     
     @Override
@@ -55,16 +57,18 @@ class ZipWorker extends SwingWorker<Double, Integer> {
     private void comprimeFichero() {
         int size = folder.list().length;
         int cont = 0;
-        try{
         
+        try{
+            
             BufferedInputStream origin = null;
                
-            FileOutputStream dest = new FileOutputStream(folder.getAbsolutePath()+".zip");
+            FileOutputStream dest = new FileOutputStream(destPath+File.separator+folder.getName()+".zip");
             ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
-
+            
             byte[] data = new byte[BUFFER_SIZE];
             
             for(File i : folder.listFiles()){
+                
                 Thread.sleep(1000);
                 cont++;
                 FileInputStream fi = new FileInputStream(i.getAbsolutePath());
@@ -85,7 +89,11 @@ class ZipWorker extends SwingWorker<Double, Integer> {
             out.close();
         }
         catch( Exception e){
-            e.printStackTrace();
+            mainFrame.errorOcurred();
+        }
+        if(size==0){
+            publish(100);
+            return;
         }
     }
 }
